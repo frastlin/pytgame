@@ -1,0 +1,6 @@
+# Compiled python modules.
+*.pyc
+
+
+#My personal files:
+/my_stuff/
