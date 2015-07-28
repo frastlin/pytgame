@@ -13,7 +13,7 @@ config = {
 	'install_requires': [''],
 	'packages': ['pytgame'],
 	'scripts': [],
-	'name': 'Py T Game'
+	'name': 'PyTGame'
 	}
 
 

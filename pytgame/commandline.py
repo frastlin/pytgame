@@ -1,8 +1,13 @@
+#Go down to "all the commands" or search for do_ and you will find the commands
 from cmd import Cmd
-from app import trigger
-from lexicon_functions import *
+from time import sleep
+import states
+from events import trigger
+from settings import fps
 
 class App_cmd(Cmd):
+
+	prompt = "\n>"
 
 	def default(self, line):
 		"""parseline breaks the line into command, arg, line. Then the getattr adds the string to the self with .."""
@@ -12,9 +17,31 @@ class App_cmd(Cmd):
 			return func[0](arg)
 		print("I do not understand that command")
 
+	def precmd(self, line):
+		"""gives the event on_input"""
+		trigger('on_input', [line])
+		return line
+
+	def postcmd(self, stop, line):
+		"""First runs the wait_for_input_time, then returns the oppiset of states.running because when states.running is False that means that the program needs to end and stop should be True."""
+		return True
+
+	def __setattr__(self, attr, value):
+		if attr not in dir(self):
+			if attr == "__ordered_fields__":
+				super.__setattr__(self, attr, value)
+			else:
+				if not hasattr(self, "__ordered_fields__"):
+					setattr(self, "__ordered_fields__", [])
+				self.__ordered_fields__.append(attr)
+				super.__setattr__(self, attr, value)
+
+#all the commands
+
 	def do_quit(self, a):
-		"""triggers an on_quit event"""
-		trigger("on_quit")
+		"""triggers an on_quit event by returning False"""
+		trigger('on_quit')
+
 
 	def do_north(self, a):
 		"""Moves the player north"""
@@ -79,23 +106,6 @@ class App_cmd(Cmd):
 		"""Closes a container or door"""
 		trigger('on_close', [a])
 
-def add(command, func=None, dictionary=current_room):
-	"""Call this with either the command as a string or with a decorator. If using it as a decorator, give the dictionary first. Take a look at north below. If one didn't use the decorator it would look like: add('north', north, top_verbs)"""
-	if not func:
-		def add_func(f):
-			if hasattr(command, '__call__'):
-				dictionary[command.__name__] = command
-			d, c = (command, f.__name__)
-			d[c] = f
-		return add_func
-	else:
-		dictionary[command] = func
-
-
-def command(c):
-	for d in commands:
-		for k in d:
-			if k.startswith(c):
-				return d[k]
-	return default
-
+if __name__ == '__main__':
+	app = App_cmd()
+	app.cmdloop()
