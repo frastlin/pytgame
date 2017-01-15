@@ -7,8 +7,12 @@ scheduler = ticker.Scheduler()
 
 def keydown():
 	"""Checks if the user pressed a key or a combo of keys and if so, returns them."""
-	k = readkey()
-	if k:events.trigger('on_keydown', [k])
+	while states.running:
+		if states.input_type == "keypress":
+			k = readkey(blocking=False)
+			if k:
+				events.trigger('on_keydown', [k])
+		time.sleep(fps)
 
 def change_input(prompt=None, keypress=None):
 	"""Toggles between raw_input and grabbing chars. The two options are prompt and keypress"""
@@ -24,15 +28,22 @@ def on_quit(a):
 	"""Is the default quit method, don't overide this unless states.running is turned to False"""
 	states.running = False
 
+@events.add
+def on_keydown(a):
+	"""Returns to the prompt on escape"""
+	if a[0] == "escape":
+		change_input('prompt')
+
 def run():
 	"""Call this when ever you wish to start the application. In the start the event on_start is created and the typing prompt is called. If you wish text to go before the typing prompt, events.add it to on_start. This is the main loop of the application."""
 	events.trigger('on_start')
 	@events.add
 	def on_start(a):states.input_time = True
 	t = threading.Thread(target=user_input.run)
+	t2 = threading.Thread(target=keydown)
 	t.start()
+	t2.start()
 	while states.running:
-		if states.input_type == "keypress":keydown()
 		events.trigger('on_tick')
 		events.tasks()
 		scheduler.tick(fps)

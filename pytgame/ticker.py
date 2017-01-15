@@ -84,7 +84,9 @@ class EventMaker:
 		"""Runs the event"""
 		self.repeats -= 1
 		if self.repeats or not self.before_delay:
-			self.function(*self.args, **self.kwargs)
+			repeat_once = self.function(*self.args, **self.kwargs)
+			if repeat_once:
+				self.repeats += 1
 		if self.repeats == 0:
 			self.done = True
 		self.elapsed_time = 0

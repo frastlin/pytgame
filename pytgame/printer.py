@@ -1,6 +1,8 @@
 from textwrap import wrap, TextWrapper
+import settings
 
-def printer(text, width=70):
+def printer(text, prompt=False, width=70):
+	text = str(text)
 	t = text.split('\n')
 	final_text = []
 	for line in t:
@@ -8,6 +10,7 @@ def printer(text, width=70):
 			final_text += ['',]
 		else:
 			final_text += wrap(line, width)
+	if prompt:final_text += [settings.prompt]
 	for i in final_text:
 		print(i)
 

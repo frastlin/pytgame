@@ -1,12 +1,11 @@
 import time
 import states
 import commands
-import builtin_commands
 from printer import printer
 from events import trigger, add
 from settings import fps
+from settings import prompt
 
-prompt = "\n>"
 default = "I do not understand that command"
 no_help = "There is no help for that command"
 default_help = "Please type ? followed by the function name like:\n?take"
@@ -41,7 +40,7 @@ def helper(command, arg):
 		arg = command[1:]
 	if arg and not "help".startswith(arg):
 		f = command_search(arg)
-		if f:printer(f.__doc__)
+		if f and f.__doc__:printer(f.__doc__)
 		else:printer(no_help)
 	else:
 		printer(default_help)
